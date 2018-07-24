@@ -1,0 +1,304 @@
+puzzle_cube
+
+(py36) Roseannes-Air:rubiks_cube_convnet anne.novesteras$ python cube_convnet_solver.py
+//anaconda/envs/py36/lib/python3.6/site-packages/h5py/__init__.py:34: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+Using TensorFlow backend.
+2018-07-23 10:23:41.414319: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+
+
+
+(py36) Roseannes-Air:rubiks_cube_convnet anne.novesteras$ python train_cube.py
+//anaconda/envs/py36/lib/python3.6/site-packages/h5py/__init__.py:34: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+Using TensorFlow backend.
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv2d_1 (Conv2D)            (None, 16, 1, 256)        2560      
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 4096)              0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 128)               524416    
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 128)               0         
+_________________________________________________________________
+dense_2 (Dense)              (None, 18)                2322      
+=================================================================
+Total params: 529,298
+Trainable params: 529,298
+Non-trainable params: 0
+_________________________________________________________________
+epoch # 0
+Epoch 1/1
+[[0. 0. 0. ... 0. 0. 1.]
+ [0. 0. 0. ... 0. 0. 0.]
+ [0. 0. 0. ... 1. 0. 0.]
+ ...
+ [0. 0. 0. ... 0. 0. 0.]
+ [1. 0. 0. ... 0. 0. 0.]
+ [0. 0. 0. ... 0. 0. 0.]] 640 (640, 18)
+Traceback (most recent call last):
+  File "train_cube.py", line 192, in <module>
+    epochs=1,verbose=2,validation_data=None,max_queue_size=1,use_multiprocessing=False,workers=6,initial_epoch =0)#generate_data(8)
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/keras/legacy/interfaces.py", line 91, in wrapper
+    return func(*args, **kwargs)
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/keras/engine/training.py", line 1426, in fit_generator
+    initial_epoch=initial_epoch)
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/keras/engine/training_generator.py", line 155, in fit_generator
+    generator_output = next(output_generator)
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/keras/utils/data_utils.py", line 793, in get
+    six.reraise(value.__class__, value, value.__traceback__)
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/six.py", line 686, in reraise
+    raise value
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/keras/utils/data_utils.py", line 658, in _data_generator_task
+    generator_output = next(self._generator)
+  File "train_cube.py", line 153, in generate_data
+    y = y.reshape(y.shape[0], y.shape[2])
+IndexError: tuple index out of range
+(py36) Roseannes-Air:rubiks_cube_convnet anne.novesteras$ python train_cube.py
+//anaconda/envs/py36/lib/python3.6/site-packages/h5py/__init__.py:34: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+Using TensorFlow backend.
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv2d_1 (Conv2D)            (None, 16, 1, 256)        2560      
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 4096)              0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 128)               524416    
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 128)               0         
+_________________________________________________________________
+dense_2 (Dense)              (None, 18)                2322      
+=================================================================
+Total params: 529,298
+Trainable params: 529,298
+Non-trainable params: 0
+_________________________________________________________________
+epoch # 0
+Epoch 1/1
+[[1. 0. 0. ... 0. 0. 0.]
+ [0. 0. 0. ... 0. 0. 0.]
+ [0. 0. 0. ... 0. 0. 0.]
+ ...
+ [0. 0. 0. ... 0. 0. 1.]
+ [0. 0. 0. ... 0. 0. 1.]
+ [0. 0. 0. ... 0. 0. 0.]] 640 (640, 18)
+2018-07-23 21:01:52.981377: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+[[0. 0. 0. ... 0. 0. 0.]
+ [0. 0. 0. ... 0. 0. 0.]
+ [0. 0. 0. ... 0. 1. 0.]
+ ...
+ [0. 0. 0. ... 1. 0. 0.]
+ [0. 0. 0. ... 0. 0. 1.]
+ [0. 0. 0. ... 0. 0. 1.]] 640 (640, 18)
+[[0. 0. 1. ... 0. 0. 0.]
+ [0. 0. 0. ... 0. 0. 0.]
+ [0. 0. 0. ... 0. 0. 1.]
+ ...
+ [0. 0. 0. ... 0. 0. 1.]
+ [0. 0. 0. ... 0. 0. 0.]
+ [0. 1. 0. ... 0. 0. 0.]] 640 (640, 18)
+^C^CTraceback (most recent call last):
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/keras/engine/training_generator.py", line 155, in fit_generator
+    generator_output = next(output_generator)
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/keras/utils/data_utils.py", line 787, in get
+    time.sleep(self.wait_time)
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "train_cube.py", line 192, in <module>
+    epochs=1,verbose=2,validation_data=None,max_queue_size=1,use_multiprocessing=False,workers=6,initial_epoch =0)#generate_data(8)
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/keras/legacy/interfaces.py", line 91, in wrapper
+    return func(*args, **kwargs)
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/keras/engine/training.py", line 1426, in fit_generator
+    initial_epoch=initial_epoch)
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/keras/engine/training_generator.py", line 237, in fit_generator
+    enqueuer.stop()
+  File "//anaconda/envs/py36/lib/python3.6/site-packages/keras/utils/data_utils.py", line 754, in stop
+    thread.join(timeout)
+  File "//anaconda/envs/py36/lib/python3.6/threading.py", line 1056, in join
+^C  File "//anaconda/envs/py36/lib/python3.6/threading.py", line 1072, in _wait_for_tstate_lock
+    elif lock.acquire(block, timeout):
+KeyboardInterrupt
+[[0. 0. 0. ... 0. 0. 0.]
+ [0. 0. 0. ... 0. 0. 0.]
+ [0. 0. 0. ... 0. 0. 1.]
+ ...
+ [0. 0. 0. ... 0. 1. 0.]
+ [0. 0. 1. ... 0. 0. 0.]
+ [0. 0. 0. ... 0. 0. 1.]] 640 (640, 18)
+(py36) Roseannes-Air:rubiks_cube_convnet anne.novesteras$ python train_cube.py
+//anaconda/envs/py36/lib/python3.6/site-packages/h5py/__init__.py:34: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+Using TensorFlow backend.
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv2d_1 (Conv2D)            (None, 16, 1, 256)        2560      
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 4096)              0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 128)               524416    
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 128)               0         
+_________________________________________________________________
+dense_2 (Dense)              (None, 18)                2322      
+=================================================================
+Total params: 529,298
+Trainable params: 529,298
+Non-trainable params: 0
+_________________________________________________________________
+epoch # 0
+Epoch 1/1
+2018-07-23 21:02:39.627279: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+ - 410s - loss: 2.6425 - acc: 0.1898
+Epoch 1/1
+ - 406s - loss: 2.3388 - acc: 0.3061
+Epoch 1/1
+ - 626s - loss: 2.2124 - acc: 0.3488
+Epoch 1/1
+ - 408s - loss: 2.1431 - acc: 0.3717
+Epoch 1/1
+ - 411s - loss: 2.0992 - acc: 0.3921
+Epoch 1/1
+ - 414s - loss: 2.0697 - acc: 0.4002
+Epoch 1/1
+ - 404s - loss: 2.0283 - acc: 0.4120
+Epoch 1/1
+ - 402s - loss: 2.0077 - acc: 0.4192
+Epoch 1/1
+ - 404s - loss: 1.9967 - acc: 0.4199
+Epoch 1/1
+ - 404s - loss: 1.9701 - acc: 0.4294
+epoch # 10
+Epoch 1/1
+ - 404s - loss: 1.9598 - acc: 0.4337
+Epoch 1/1
+ - 402s - loss: 1.9469 - acc: 0.4365
+Epoch 1/1
+ - 402s - loss: 1.9404 - acc: 0.4398
+Epoch 1/1
+ - 400s - loss: 1.9271 - acc: 0.4441
+Epoch 1/1
+ - 403s - loss: 1.9240 - acc: 0.4459
+Epoch 1/1
+ - 403s - loss: 1.9080 - acc: 0.4495
+Epoch 1/1
+ - 402s - loss: 1.9050 - acc: 0.4526
+Epoch 1/1
+ - 400s - loss: 1.8860 - acc: 0.4575
+Epoch 1/1
+ - 401s - loss: 1.8829 - acc: 0.4588
+Epoch 1/1
+ - 401s - loss: 1.8862 - acc: 0.4558
+epoch # 20
+Epoch 1/1
+ - 404s - loss: 1.8737 - acc: 0.4596
+Epoch 1/1
+ - 402s - loss: 1.8666 - acc: 0.4640
+Epoch 1/1
+ - 404s - loss: 1.8705 - acc: 0.4643
+Epoch 1/1
+ - 402s - loss: 1.8580 - acc: 0.4627
+Epoch 1/1
+ - 403s - loss: 1.8509 - acc: 0.4691
+Epoch 1/1
+ - 402s - loss: 1.8564 - acc: 0.4674
+Epoch 1/1
+ - 403s - loss: 1.8373 - acc: 0.4729
+Epoch 1/1
+ - 403s - loss: 1.8487 - acc: 0.4692
+Epoch 1/1
+ - 400s - loss: 1.8419 - acc: 0.4736
+Epoch 1/1
+ - 404s - loss: 1.8435 - acc: 0.4744
+epoch # 30
+Epoch 1/1
+ - 402s - loss: 1.8233 - acc: 0.4794
+Epoch 1/1
+ - 402s - loss: 1.8300 - acc: 0.4764
+Epoch 1/1
+ - 402s - loss: 1.8134 - acc: 0.4802
+Epoch 1/1
+ - 402s - loss: 1.8185 - acc: 0.4785
+Epoch 1/1
+ - 402s - loss: 1.8168 - acc: 0.4824
+Epoch 1/1
+ - 404s - loss: 1.8232 - acc: 0.4777
+Epoch 1/1
+ - 402s - loss: 1.8145 - acc: 0.4829
+Epoch 1/1
+ - 404s - loss: 1.8123 - acc: 0.4816
+Epoch 1/1
+ - 403s - loss: 1.8073 - acc: 0.4849
+Epoch 1/1
+ - 402s - loss: 1.8012 - acc: 0.4854
+epoch # 40
+Epoch 1/1
+ - 402s - loss: 1.7991 - acc: 0.4865
+Epoch 1/1
+ - 405s - loss: 1.7972 - acc: 0.4875
+Epoch 1/1
+ - 402s - loss: 1.7936 - acc: 0.4902
+Epoch 1/1
+ - 401s - loss: 1.7898 - acc: 0.4905
+Epoch 1/1
+ - 404s - loss: 1.7836 - acc: 0.4905
+Epoch 1/1
+ - 400s - loss: 1.7963 - acc: 0.4906
+Epoch 1/1
+ - 404s - loss: 1.7939 - acc: 0.4929
+Epoch 1/1
+ - 403s - loss: 1.7871 - acc: 0.4925
+Epoch 1/1
+ - 402s - loss: 1.7895 - acc: 0.4908
+Epoch 1/1
+ - 402s - loss: 1.7931 - acc: 0.4872
+epoch # 50
+Epoch 1/1
+ - 403s - loss: 1.7841 - acc: 0.4933
+Epoch 1/1
+ - 404s - loss: 1.7890 - acc: 0.4908
+Epoch 1/1
+ - 403s - loss: 1.7695 - acc: 0.4958
+Epoch 1/1
+ - 403s - loss: 1.7799 - acc: 0.4938
+Epoch 1/1
+ - 402s - loss: 1.7640 - acc: 0.4965
+Epoch 1/1
+ - 401s - loss: 1.7670 - acc: 0.4983
+Epoch 1/1
+ - 402s - loss: 1.7698 - acc: 0.4938
+Epoch 1/1
+ - 402s - loss: 1.7714 - acc: 0.4973
+Epoch 1/1
+ - 402s - loss: 1.7640 - acc: 0.5020
+Epoch 1/1
+ - 401s - loss: 1.7594 - acc: 0.4967
+epoch # 60
+Epoch 1/1
+ - 404s - loss: 1.7687 - acc: 0.4978
+Epoch 1/1
+ - 401s - loss: 1.7540 - acc: 0.5009
+Epoch 1/1
+ - 400s - loss: 1.7647 - acc: 0.4985
+Epoch 1/1
+ - 405s - loss: 1.7624 - acc: 0.5018
+Epoch 1/1
+ - 402s - loss: 1.7585 - acc: 0.5003
+Epoch 1/1
+ - 402s - loss: 1.7542 - acc: 0.5025
+Epoch 1/1
+ - 401s - loss: 1.7603 - acc: 0.5042
+Epoch 1/1
+ - 402s - loss: 1.7547 - acc: 0.5038
+Epoch 1/1
+ - 403s - loss: 1.7567 - acc: 0.5027
+Epoch 1/1
+ - 401s - loss: 1.7575 - acc: 0.5041
+
