@@ -27,6 +27,7 @@ import os
 from tic_tac_toe.tic_tac_toe_game import TicTacToeGame
 from othello.othello_game import OthelloGame
 from connect_four.connect_four_game import ConnectFourGame
+from rubiks_cube.rubiks_cube_game import RubiksCubeGame
 from neural_net import NeuralNetworkWrapper
 from train import Train
 from human_play import HumanPlay
@@ -217,6 +218,8 @@ if __name__ == '__main__':
         game = OthelloGame()
     elif CFG.game == 2:
         game = ConnectFourGame()
+    elif CFG.game == 3:
+        game = RubiksCubeGame()
 
     net = NeuralNetworkWrapper(game)
 
