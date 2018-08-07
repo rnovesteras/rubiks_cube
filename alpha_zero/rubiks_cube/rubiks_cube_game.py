@@ -10,9 +10,17 @@ Created on Sun Jul 29 06:37:01 2018
 """Class for Board State and Logic."""
 from copy import deepcopy
 import numpy as np
-import pycuber as pc
 from game import Game
-
+import pycuber as pc
+from random import randint
+import numpy as np
+import keras
+from keras.utils import to_categorical
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Conv2D, MaxPooling2D
+from keras import backend as K
+from keras.models import load_model
 
 class RubiksCubeGame(Game):
     """Represents the game board and its logic.
@@ -28,7 +36,7 @@ class RubiksCubeGame(Game):
     """
 
     def __init__(self):
-        """Initializes TicTacToeGame with the initial board state."""
+        """Initializes RubiksCubeGame with the initial board state."""
         super().__init__()
         self.row = 3
         self.column = 3

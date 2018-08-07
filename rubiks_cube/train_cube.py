@@ -26,17 +26,17 @@ def sol2cat(solution):
     # transform solution to one hot vector encoding
     # first map move to number, then genereate one hot encoding
     # using keras utils
-    
+
     global possible_moves
     sol_tmp = []
     for j in range(len(solution)):
         sol_tmp.append(possible_moves.index(solution[j]))
-        
+
     sol_cat = to_categorical(sol_tmp)
-    
+
     return sol_cat
-    
-    
+
+
 
 def cube2np(mycube):
     # transform cube object to np array
@@ -53,9 +53,9 @@ def cube2np(mycube):
     return cube_np
 
 def generate_game(max_moves = max_moves):
-    
+
     # generate a single game with max number of permutations number_moves
-    
+
     mycube = pc.Cube()
 
     global possible_moves
@@ -64,7 +64,7 @@ def generate_game(max_moves = max_moves):
     number_moves = max_moves#randint(3,max_moves)
     for j in range(number_moves):
         formula.append(possible_moves[randint(0,len(possible_moves)-1)])
-        
+
     #my_formula = pc.Formula("R U R' U' D' R' F R2 U' D D R' U' R U R' D' F'")
 
     my_formula = pc.Formula(formula)
@@ -74,7 +74,7 @@ def generate_game(max_moves = max_moves):
     # use this instead if you want it in OG data type
 
     cube_scrambled = mycube.copy()
-    
+
     solution = my_formula.reverse()
 
     #print(mycube)
@@ -83,15 +83,15 @@ def generate_game(max_moves = max_moves):
     return cube_scrambled,solution
 
 def generate_N_games(N=10,max_moves=max_moves):
-    
-    
+
+
     scrambled_cubes = []
     solutions = []
     for j in range(N):
         cube_scrambled,solution = generate_game(max_moves = max_moves)
         scrambled_cubes.append(cube_scrambled)
         solutions.append(solution)
-        
+
     return scrambled_cubes,solutions
 
 def generate_action_space(number_games=100):
@@ -102,11 +102,7 @@ def generate_action_space(number_games=100):
     global max_moves
     while play_game:
 
-
         scrambled_cube,solutions = generate_game(max_moves = max_moves)
-
-
-
 
         state = scrambled_cube.copy()
         for j in range(len(solutions)):
@@ -125,12 +121,11 @@ def generate_action_space(number_games=100):
 
         states_hist.append(state.copy())
 
-
         game_count+=1
 
         if game_count>=number_games:
             break
-            
+
     return D
 
 def generate_data(N=32):
@@ -152,7 +147,7 @@ def generate_data(N=32):
 #        print(y, len(y), y.shape)
         y = y.reshape(y.shape[0], y.shape[1])
 
-        
+
         yield (x,y)
 
 
@@ -160,7 +155,7 @@ def generate_data(N=32):
 
 batch_size = 256
 num_classes = len(possible_moves)
-num_epochs = 150
+num_epochs = 100
 input_shape = (18, 3, 1)
 
 model = Sequential()
@@ -184,14 +179,10 @@ model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adadelta(),
               metrics=['accuracy'])
 
-for j in range(num_epochs): 
-    
+for j in range(num_epochs):
+
     if (j%10 == 0):
         print ('epoch #',j)
     model.fit_generator(generator= generate_data(64),steps_per_epoch=50,
                                   epochs=1,verbose=2,validation_data=None,max_queue_size=1,use_multiprocessing=True,workers=6,initial_epoch =0)#generate_data(8)
 model.save('rubiks_model_wtvr.h5')  # creates a HDF5 file 'my_model.h5'
-
-
-
-
