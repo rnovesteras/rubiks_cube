@@ -675,6 +675,49 @@ class ConvModel2D3D(BaseModel):
         return input_array
 
     def process_training_data(self, inputs, policies, values, augment=True):
+        """
+        Convert training data to arrays.
+        Augment data
+        Reshape to fit model input.
+        """
+
+        # augment with all 48 color rotations
+        if augment:
+            inputs, policies, values = augment_data(inputs, policies, values)
+
+        # process arrays now to save time during training
+        if self.history == 1:
+            inputs = inputs.reshape((-1, 54, 6))
+        else:
+            # use that the inputs are in order to attach the history
+            # use the policy/input match to determine when we reached a new game
+            next_cube = None
+            input_array_with_history = None
+            input_list = []
+            for state, policy in zip(inputs, policies):
+                cube = BatchCube()
+                cube.load_bit_array(state)
+
+                if next_cube is None or cube != next_cube:
+                    # blank history
+                    input_array_history = np.zeros((self.history-1, 54, 6), dtype=bool)
+                else:
+                    input_array_history = input_array_with_history[:-1]
+
+                input_array_state = state.reshape((1, 54, 6))
+                input_array_with_history = np.concatenate([input_array_state, input_array_history], axis=0)
+
+                input_array = np.rollaxis(input_array_with_history,  1, 0)
+                input_array = input_array.reshape((54, self.history * 6))
+                input_list.append(input_array)
+
+                action = np.argmax(policy)
+                next_cube = cube.copy()
+                next_cube.step([action])
+
+            inputs = np.array(input_list)
+
+        return inputs, policies, values
 
 
 class ADIModel(BaseModel):
@@ -683,8 +726,9 @@ class ADIModel(BaseModel):
     """
     def __init__(self, use_cache=True, max_cache_size=10000, rotationally_randomize=False, history=1):
         BaseModel.__init__(self, use_cache, max_cache_size, rotationally_randomize, history)
-        self.input_shape = (54, self.history * 6)
-        return None
+        assert history == 1, "history > 1 not yet implemented for ConvModel"
+
+        self.input_shape = (6*6, 3, 3)
 
     def build(self):
         import numpy as np
@@ -697,57 +741,74 @@ class ADIModel(BaseModel):
         import keras.backend as K
         import tensorflow as tf
 
-        from model_constant_arrays import x3d, y3d, z3d, neighbors
-        neighbors[neighbors == -1] = 54
-
-        # TODO: ADD FUNCTION DEFS FOR IMPLEMENTATION OF ADI
+        # TODO:
         #  Assign a higher training weight to samples that are closer to the solved cube compared to samples that are further away from solution
         # loss weights : W(x_i) 1/D(x_i)     (D(x_i) : number of scrambles it took to generate)
 
-        def ADI():
-            return
+        state_input = Input(shape=(6*6, 3, 3), name='state_input')
 
-        def policy_block():
-            conv = conv_block(in_tensor, filter_size=filter_size)
-            flat = Flatten()(conv)
-            hidden = Dense(hidden_size, activation=ELU(1.0),
-                           kernel_regularizer=l2(0.001),
-                           bias_regularizer=l2(0.001))(flat)
-            output = Dense(12, activation='softmax',
-                           kernel_regularizer=l2(0.001),
-                           bias_regularizer=l2(0.001),
-                           name='policy_output')(hidden)
-            return output
+        conv = Conv2D(2048, kernel_size=3,
+                          strides=(1, 1),
+                          padding='same',
+                          data_format="channels_first",
+                          kernel_regularizer=l2(0.001),
+                          bias_regularizer=l2(0.001))(state_input)
+        batch = BatchNormalization(axis=1)(conv)
+        end_of_block = Activation('relu')(batch)
 
-        def value_block():
-            conv = conv_block(in_tensor, filter_size=filter_size)
-            flat = Flatten()(conv)
-            hidden = Dense(hidden_size, activation=ELU(1.0),
-                           kernel_regularizer=l2(0.001),
-                           bias_regularizer=l2(0.001))(flat)
-            output = Dense(1, activation='softmax',
-                           kernel_regularizer=l2(0.001),
-                           bias_regularizer=l2(0.001),
-                           name='value_output')(hidden)
-            return output
-
-        # the network
-        state_input = Input(shape=self.input_shape, name='state_input')
-
-        # convolutional
-        # block = conv_block(state_input, filter_size=64)
-
-        # multiple residuals
-        # block = residual_block(block, filter_size=64)
-        # block = residual_block(block, filter_size=64)
-        # block = residual_block(block, filter_size=64)
-        # block = residual_block(block, filter_size=64)
+        conv = Conv2D(2048, kernel_size=3,
+                          strides=(1, 1),
+                          padding='same',
+                          data_format="channels_first",
+                          kernel_regularizer=l2(0.001),
+                          bias_regularizer=l2(0.001))(end_of_block)
+        batch = BatchNormalization(axis=1)(conv)
+        relu = Activation('relu')(batch)
+        conv = Conv2D(2048, kernel_size=3,
+                          strides=(1, 1),
+                          padding='same',
+                          data_format="channels_first",
+                          kernel_regularizer=l2(0.001),
+                          bias_regularizer=l2(0.001))(relu)
+        batch = BatchNormalization(axis=1)(conv)
+        conn = add([batch, end_of_block])
+        end_of_block = Activation('relu')(conn)
 
         # policy head
-        policy_output = policy_block(block, filter_size=64, hidden_size=64)
+        conv = Conv2D(512, kernel_size=1,
+                          strides=(1, 1),
+                          padding='same',
+                          data_format="channels_first",
+                          kernel_regularizer=l2(0.001),
+                          bias_regularizer=l2(0.001))(end_of_block)
+        batch = BatchNormalization(axis=1)(conv)
+        relu = Activation('relu')(batch)
+        flat = Flatten()(relu)
+        hidden = Dense(512, activation='relu',
+                             kernel_regularizer=l2(0.001),
+                             bias_regularizer=l2(0.001))(flat)
+        policy_output = Dense(12, activation='softmax',
+                                  kernel_regularizer=l2(0.001),
+                                  bias_regularizer=l2(0.001),
+                                  name='policy_output')(hidden)
 
         # value head
-        value_output = value_block(block, filter_size=64, hidden_size=64)
+        conv = Conv2D(512, kernel_size=1,
+                          strides=(1, 1),
+                          padding='same',
+                          data_format="channels_first",
+                          kernel_regularizer=l2(0.001),
+                          bias_regularizer=l2(0.001))(end_of_block)
+        batch = BatchNormalization(axis=1)(conv)
+        relu = Activation('relu')(batch)
+        flat = Flatten()(relu)
+        hidden = Dense(512, activation='relu',
+                             kernel_regularizer=l2(0.001),
+                             bias_regularizer=l2(0.001))(flat)
+        value_output = Dense(1, activation='sigmoid',
+                                  kernel_regularizer=l2(0.001),
+                                  bias_regularizer=l2(0.001),
+                                  name='value_output')(hidden)
 
         # combine
         model = Model(inputs=state_input, outputs=[policy_output, value_output])
@@ -755,10 +816,27 @@ class ADIModel(BaseModel):
                             'value_output': 'mse'},
                       loss_weights={'policy_output': 1., 'value_output': 1.},
                       optimizer=RMSprop(lr=self.learning_rate))
+
         self._build(model)
 
     def process_single_input(self, input_array):
-        return
+        input_array = input_array.reshape((-1, 54, 6))
+        input_array = np.rollaxis(input_array, 2, 1).reshape(-1, 6*6, 3, 3)
+        return input_array
 
     def process_training_data(self, inputs, policies, values, augment=True):
-        return
+        """
+        Convert training data to arrays.
+        Augment data
+        Reshape to fit model input.
+        """
+
+        # augment with all 48 color rotations
+        if augment:
+            inputs, policies, values = augment_data(inputs, policies, values)
+
+        # process arrays now to save time during training
+        inputs = inputs.reshape((-1, 54, 6))
+        inputs = np.rollaxis(inputs, 2, 1).reshape(-1, 6*6, 3, 3)
+
+        return inputs, policies, values
